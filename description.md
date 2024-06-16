@@ -9,16 +9,20 @@ Despite the rigorous process, several limitations and uncertainties persist. The
 ## Final results 
 ### visualization maps from my code
 - Cu concentration (ppm)
+
 ![alt text](result_images/cu_map.png)
 
 - Co concentration (ppm)
+
 ![alt text](result_images/co_map.png)
 
 
 ### visualization maps from QGIS
 - Cu concentration (ppm)
+
 ![alt text](result_images/cu_map_QGIS.png)
 
 - Co concentration (ppm)
+
 ![alt text](result_images/co_map_QGIS.png)
 
