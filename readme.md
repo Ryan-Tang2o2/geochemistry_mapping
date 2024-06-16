@@ -6,7 +6,7 @@ Geochemical soil surveys are commonly used in mineral exploration. Workers colle
 
 This project processes CSV files to plot Cu and Co concentrations, generating images (TIFF) and shapefiles that can be used in GIS software like QGIS.
 
-In the description file, more information about the assumptions made during this process, discussions about the results, and the final outcomes can be found.
+In the `description.md file, more information about the assumptions made during this process, discussions about the results, and the final outcomes can be found.
 
 
 ## Directory Structure
@@ -14,7 +14,7 @@ project_root
 │
 ├── readme.md
 ├── description.md                 # Description of approach and final results
-├── requirements.txt               # List of required dependencies
+├── environment.yml                # List of required dependencies
 ├── main_mapping_Cu_Co.ipynb       # Main code
 │
 ├── utility_function/              # Utility functions
@@ -73,16 +73,19 @@ To generate plots of Cu and Co concentrations, follow these steps:
 
 
 ## Usage Instructions
-1. Clone the repository or unzip the file
-2. Navigate to the project directory
-3. Install the required dependencies
-- conda create -n geochem --file requirments.txt
-geochem can be replaced
-
-4. Run the Jupyter notebook to process the data and generate outputs:
-- jupyter notebook main_mapping_Cu_Co.ipynb
-
+1. Unzip the file.
+2. Navigate to the project directory.
+3. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+4. If using VS Code, run the Jupyter notebook to process the data and generate outputs:
+- Change the Python interpreter to the environment you built.
+- Open a terminal and run:
+  ```bash
+  jupyter notebook main_mapping_Cu_Co.ipynb
 5. The generated files will be saved in the appropriate directories under data/outputs/.
+
+** The main_mapping_Cu_Co.ipynb can also works on Colab
 
 
 

@@ -3,7 +3,6 @@ from shapely.geometry import MultiPoint, Polygon
 from shapely.ops import nearest_points
 
 
-# define bnd from the points and increate the bnd to 2 meter
 def find_minimum_rectangle_gdf(data_gdf, buffer=1.):
     """
     Finds the minimum bounding rectangle of the points in a GeoDataFrame and increases the boundary by a specified buffer distance.
@@ -14,7 +13,8 @@ def find_minimum_rectangle_gdf(data_gdf, buffer=1.):
 
     Returns:
     GeoDataFrame: GeoDataFrame containing the buffered minimum bounding rectangle.
-    """    
+    """
+    
     bounds = data_gdf.unary_union.bounds
     minx, miny, maxx, maxy = bounds
 
@@ -36,7 +36,10 @@ def distance_nearest_neighbor_pnt(gdf):
     Returns:
     list: List of distances to the nearest neighbor for each point.
     """
-        
+    
+    if gdf.shape[0] == 1:
+        return [0]
+    
     distances = []
     for i, point in enumerate(gdf.geometry):
         # Exclude the point itself

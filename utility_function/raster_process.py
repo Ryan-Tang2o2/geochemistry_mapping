@@ -13,44 +13,59 @@ def save_raster(raster_data, file_name):
 
     Parameters:
     raster_data (dict): Dictionary containing the raster data and metadata. 
-                 Expected keys are 'Image', 'band_name', 'GeoT_im', 'ProjR_im', and 'nodata'.
+                        Expected keys are 'Image', 'band_name', 'GeoT_im', 'ProjR_im', and 'nodata'.
     file_name (str): Path to the output file. Should have a '.tif' or '.tiff' extension.
 
     Returns:
+    None
     """
+    
+    gdal.UseExceptions()
 
-    I = raster_data["Image"]
-    I = I.reshape(I.shape[0], I.shape[1], 1)
+    # Extract raster data and reshape if necessary
+    image = raster_data.get("Image")
+    if image is None:
+        raise ValueError("raster_data must contain 'Image' key.")
+        
+    if len(image.shape) == 2:
+        image = image[:, :, np.newaxis]
 
-    bnameExist = False
-    if "band_name" in raster_data:
-        bnameExist=True
-        band_name = raster_data["band_name"]
+    band_names = raster_data.get("band_name")
+    geotransform = raster_data.get("GeoT_im")
+    projection = raster_data.get("ProjR_im")
+    nodata_value = raster_data.get("nodata")
 
-    DataType = gdal.GDT_Float64
+    # Determine data type
+    data_type = gdal.GDT_Float64
 
-    if file_name[-3::] in ("tiff", "tif", "TIF", "TIFF"):
+    # Determine the driver to use
+    if file_name.lower().endswith(('.tif', '.tiff')):
         driver = gdal.GetDriverByName("GTiff")
+    else:
+        raise ValueError("Output file must have a .tif or .tiff extension.")
 
-    DataSet =   driver.Create(file_name, I.shape[1], I.shape[0], I.shape[2], DataType )
+    # Create the dataset
+    dataset = driver.Create(file_name, image.shape[1], image.shape[0], image.shape[2], data_type)
+    if dataset is None:
+        raise RuntimeError("Failed to create the dataset. Check the file path and permissions.")
 
-    if "GeoT_im" in raster_data:
-        geotrans_im = raster_data["GeoT_im"]
-        DataSet.SetGeoTransform(geotrans_im)
+    # Set the geotransform and projection
+    if geotransform:
+        dataset.SetGeoTransform(geotransform)
+    if projection:
+        dataset.SetProjection(projection)
 
-    if "ProjR_im" in raster_data:
-        proj_img = raster_data["ProjR_im"]
-        DataSet.SetProjection(proj_img)
+    # Write the array and set metadata
+    for i in range(image.shape[2]):
+        band = dataset.GetRasterBand(i + 1)
+        band.WriteArray(image[:, :, i])
+        if nodata_value is not None:
+            band.SetNoDataValue(nodata_value)
+        if band_names and i < len(band_names):
+            band.SetDescription(band_names[i])
 
-    # Write the array
-    for i in range(I.shape[2]):
-        DataSet.GetRasterBand(i+1).WriteArray(   I[:,:,i] )
-        if "nodata" in raster_data:
-            DataSet.GetRasterBand(i+1).SetNoDataValue(raster_data["nodata"])
-        if bnameExist:
-            DataSet.GetRasterBand(i+1).SetDescription(band_name[i])
-
-    del DataSet
+    # Close the dataset
+    dataset = None
 
 
 

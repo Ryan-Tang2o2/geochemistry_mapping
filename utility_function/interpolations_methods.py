@@ -36,6 +36,7 @@ def interpolate_pnt_griddata(data_gdf, column, cell_size=1., buffer=0.):
     Returns:
     dict: Dictionary containing the interpolated raster data and metadata.
     """
+    
     grid_x, grid_y = create_gridx_gridy(data_gdf, cell_size=cell_size, buffer=0)
 
     points = np.array(list(zip(data_gdf.geometry.x, data_gdf.geometry.y)))
@@ -57,6 +58,7 @@ def interpolate_pnt_griddata(data_gdf, column, cell_size=1., buffer=0.):
     data_raster["GeoT_im"] = GeoT_im
     data_raster["ProjR_im"] = ProjR_im
     return data_raster
+
 
 def interpolate_pnt_idw(data_gdf, column, cell_size=1, distance_coef=2.0, buffer=0.):
     """
@@ -84,7 +86,7 @@ def interpolate_pnt_idw(data_gdf, column, cell_size=1, distance_coef=2.0, buffer
     weights /= (weights.sum(axis=0) + 1e-10)
     grid_z = np.sum(weights * target[:,None,None], axis=0)
 
-    # preprocess
+    # preprocess 
     grid_z = grid_z[:, ::-1]
     grid_z[np.isnan(grid_z)] = -2
     grid_z[grid_z<0] = 0

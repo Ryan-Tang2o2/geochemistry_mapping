@@ -1,5 +1,5 @@
 # Decription 
-To generate the maps, I adopted the best practice of ensuring the geodataframe had no null values. Initially, the data included various units, with some values given in percentages (pct) and others in parts per million (ppm). To standardize the dataset, I converted all pct values to ppm using the formula: value(ppm) = value(pct) * 1e4. Addressing the issue of null values, I noticed a strong correlation between copper (Cu) and cobalt (Co) and initially used a KNN model for imputation. However, the accuracy was low, so I switched to a linear model, which produced much more satisfactory results. This approach was based on the assumption that a significant geological relationship exists between Cu and Co, analogous to the well-documented relationship between pH and calcium (Ca) in agricultural science.
+To generate the maps, I adopted the best practice of ensuring the geodataframe had no null values. Initially, the data included various units, with some values given in percentages (pct) and others in parts per million (ppm). To standardize the dataset, I converted all pct values to ppm using the formula: value(ppm) = value(pct) * 1e4. Addressing the issue of null values, I noticed a strong correlation between copper (Cu) and cobalt (Co) and initially used a KNN model for imputation. However, the accuracy was low, reurn same value for Cu ocncentration above 5000 ppm, so I switched to a linear model, which produced much more satisfactory results. This approach was based on the assumption that a significant geological relationship exists between Cu and Co.
 
 Determining the appropriate cell or pixel size was critical, as it defines the resolution of the resulting maps. Ideally, this should be aligned with the density and distribution of the data points. For this project, I first calculated the point density and the average distance between points, which was 9.87 meters. The minimum distance between points was 0.88 meters, with an average of 5 meters. In geomatics, the cell size is often set to half the average distance between points or less, suggesting a cell size of approximately 5 meters. However, considering the higher cost and value of geological data collection, I decided on a smaller cell size of 0.5 meters to ensure finer resolution. Another reason for the 0.5-meter cell size was the significant difference in Co concentrations for samples 0.88 meters apart (100 ppm differences). To create a 2D map of concentration, a boundary is needed. To define the boundaries of the geodataframe, I created a rectangle around the points and added a 5-meter buffer (average distance between points) to ensure all points were included. For interpolation, I created a grid over the boundary and tested two methods: Inverse Distance Weighting (IDW) and griddata based on linear, nearest, and cubic interpolation. IDW with a distance coefficient of 3 provided the best results. In IDW, the results of the interpolated image at the point locations remain the same, with gradual changes around the points. The interpolated grid cells were converted to raster data and saved in TIF format for use in QGIS software, facilitating integration into other data science workflows.
 
@@ -8,21 +8,21 @@ Despite the rigorous process, several limitations and uncertainties persist. The
 
 ## Final results 
 ### visualization maps from my code
-- Cu concentration (ppm)
+- Cu (ppm) concentration
 
 ![alt text](result_images/cu_map.png)
 
-- Co concentration (ppm)
+- Co (ppm) concentration
 
 ![alt text](result_images/co_map.png)
 
 
-### visualization maps from QGIS
-- Cu concentration (ppm)
+### Visualization maps using QGIS
+- Cu (ppm) concentration
 
 ![alt text](result_images/cu_map_QGIS.png)
 
-- Co concentration (ppm)
+- Co (ppm) concentration
 
 ![alt text](result_images/co_map_QGIS.png)
 
