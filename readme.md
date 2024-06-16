@@ -2,23 +2,25 @@
 Continuous spatial distribution of Cu and Co concentrations
 
 ## Project Overview
-Geochemical soil surveys are commonly used in mineral exploration. Workers walk or drive around a (potentially large) area and collect soil samples at specified locations. These samples are analyzed to determine the concentration of certain trace metals. The metal content in soils depends both on the composition of the bedrock directly beneath the soils and by surficial processes like fluid flows.
+Geochemical soil surveys are commonly used in mineral exploration. Workers collect soil samples from specified locations across an area. These samples are analyzed to determine the concentrations of trace metals like copper (Cu) and cobalt (Co).
 
-This project processes CSV files to plot Cu (Copper) and Co (Cobalt) concentrations, generating images (TIFF) and shapefiles that can be used in GIS software like QGIS.
+This project processes CSV files to plot Cu and Co concentrations, generating images (TIFF) and shapefiles that can be used in GIS software like QGIS.
+
+In the description file, more information about the assumptions made during this process, discussions about the results, and the final outcomes can be found.
 
 
 ## Directory Structure
 project_root
 │
 ├── readme.md
-├── description.md
-├── requirements.txt               
-├── main_mapping_Cu_Co.ipynb       # main code 
+├── description.md                 # Description of approach and final results
+├── requirements.txt               # List of required dependencies
+├── main_mapping_Cu_Co.ipynb       # Main code
 │
-├── utility_function/              # All utility functions
+├── utility_function/              # Utility functions
 │   ├── interpolations_method.py   # Interpolation algorithms
 │   ├── raster_process.py          # Functions to analyze raster data
-│   └── victor_process.py          # Functions to analyze vector data
+│   └── vector_process.py          # Functions to analyze vector data
 │
 ├── data/
 │   ├── raw/                       # Original CSV files
@@ -31,31 +33,30 @@ project_root
 │       └── co_idw_3.tif           # TIFF image of Co based on IDW interpolation (weight = 3)
 │
 ├── docs/                          # Project documentation in PDF
-└── result_images/                 # Output images from my code. PNG file that present Cu and Co cocentration in 2D
-│       └── seconday_results       # Output images from my code. PNG files
+├── result_images/                 # Output images from the code
+│   └── secondary_results          # Additional output images
 │
-└── test/                          # Output images from my code or QGIS 
-│   ├──  test_function.ipynb       # code to test my functions
-
+└── test/                          # Testing functions and outputs
+    ├── test_function.ipynb        # Code to test functions
 
 
 
 ## Data Processing Steps
-To generate plots of Cu and Co concentrations across the region, several processing steps are necessary:
+To generate plots of Cu and Co concentrations, follow these steps:
 
 1. Data Exploration:
-- Scatterplots and Histograms: Plot scatterplots and histograms of the data to understand the spatial distribution and identify patterns. For this project I did not focuse on anamolies, as the data was assumed to be reliable
+- Scatterplots and Histograms: Plot scatterplots and histograms to understand spatial distribution and identify patterns. Anomalies were not the focus as the data was assumed to be reliable.
 2. Data preperation:
 - Unit converion: All data with pct unit was converted to ppm 
 - Fill Null value: Several different model were used to fill Null value fo Co.
 3. Boundary creation:
-- boundary creation: Create a boundary of the geospatial data using the minimum bounding box of the data points. A buffer of 5 meter was used to have a bigger bounday
+- boundary creation: Create a boundary of the geospatial data using the minimum bounding box of the data points with a 5-meter buffer.
 4. Interpolation:
-- Grid Creation: Create grid cells over the boundary of the data.
 - Inverse Distance Weighting (IDW): Use the IDW method with a distance coefficient of 3.
 5. Raster Data Generation:
 - Raster Conversion: Convert the interpolated grid cells into raster data (TIFF format) for use in GIS software.
-- viualize raste: the final map of Cu and Co concentration was shown in a log scale.
+- viualize raste. Visualize the final map of Cu and Co concentration on a log scale.
+
 
 ## Dependencies
 - Python 3.x
@@ -72,10 +73,17 @@ To generate plots of Cu and Co concentrations across the region, several process
 
 
 ## Usage Instructions
-- pull the repository
-- install the required dependecis
-- run the notebook to process the data and generate the outputs
-- the generated files will be saved in the appropriate directories
+1. Clone the repository or unzip the file
+2. Navigate to the project directory
+3. Install the required dependencies
+- conda create -n geochem --file requirments.txt
+geochem can be replaced
+
+4. Run the Jupyter notebook to process the data and generate outputs:
+- jupyter notebook main_mapping_Cu_Co.ipynb
+
+5. The generated files will be saved in the appropriate directories under data/outputs/.
+
 
 
 ## Contact Information

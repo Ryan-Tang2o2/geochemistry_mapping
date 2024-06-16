@@ -7,53 +7,74 @@ import matplotlib.font_manager as fm
 from osgeo import gdal
 
 
-def save_raster(Data, FileName):
+def save_raster(raster_data, file_name):
     """
     Saves raster data to a file using GDAL.
 
     Parameters:
-    Data (dict): Dictionary containing the raster data and metadata. 
+    raster_data (dict): Dictionary containing the raster data and metadata. 
                  Expected keys are 'Image', 'band_name', 'GeoT_im', 'ProjR_im', and 'nodata'.
-    FileName (str): Path to the output file. Should have a '.tif' or '.tiff' extension.
+    file_name (str): Path to the output file. Should have a '.tif' or '.tiff' extension.
 
     Returns:
-    successful: 200
     """
 
-    I = Data["Image"]
+    I = raster_data["Image"]
     I = I.reshape(I.shape[0], I.shape[1], 1)
 
     bnameExist = False
-    if "band_name" in Data:
+    if "band_name" in raster_data:
         bnameExist=True
-        band_name = Data["band_name"]
+        band_name = raster_data["band_name"]
 
     DataType = gdal.GDT_Float64
 
-    if FileName[-3::] in ("tiff", "tif", "TIF", "TIFF"):
+    if file_name[-3::] in ("tiff", "tif", "TIF", "TIFF"):
         driver = gdal.GetDriverByName("GTiff")
 
-    DataSet =   driver.Create( FileName, I.shape[1], I.shape[0], I.shape[2], DataType )
+    DataSet =   driver.Create(file_name, I.shape[1], I.shape[0], I.shape[2], DataType )
 
-    if "GeoT_im" in Data:
-        GeoT_im = Data["GeoT_im"]
-        DataSet.SetGeoTransform(GeoT_im)
+    if "GeoT_im" in raster_data:
+        geotrans_im = raster_data["GeoT_im"]
+        DataSet.SetGeoTransform(geotrans_im)
 
-    if "ProjR_im" in Data:
-        ProjR_im = Data["ProjR_im"]
-        DataSet.SetProjection(ProjR_im)
+    if "ProjR_im" in raster_data:
+        proj_img = raster_data["ProjR_im"]
+        DataSet.SetProjection(proj_img)
 
     # Write the array
     for i in range(I.shape[2]):
         DataSet.GetRasterBand(i+1).WriteArray(   I[:,:,i] )
-        if "nodata" in Data:
-            DataSet.GetRasterBand(i+1).SetNoDataValue(Data["nodata"])
+        if "nodata" in raster_data:
+            DataSet.GetRasterBand(i+1).SetNoDataValue(raster_data["nodata"])
         if bnameExist:
             DataSet.GetRasterBand(i+1).SetDescription(band_name[i])
 
     del DataSet
-    return 200, 'raster was saved'
 
+
+
+def calculate_raster_extent(geotrans_im, raster_size):
+    """
+    Calculates the extent of the raster image based on geotransformation parameters and raster size.
+
+    Parameters:
+    - geotrans_im: list of floats
+        Geotransformation parameters.
+    - raster_size: tuple of ints
+        Size of the raster data (number of rows, number of columns).
+
+    Returns:
+    - extent: list of floats
+        Extent of the image in the format [xmin, xmax, ymin, ymax].
+    """
+    xmin, cell_size_x, _, ymax, _, cell_size_y_neg = geotrans_im
+    cell_size_y = -cell_size_y_neg
+
+    x_max = xmin + cell_size_x * raster_size[1]
+    y_min = ymax - cell_size_y * raster_size[0]
+    extent = [xmin, x_max, y_min, ymax]
+    return extent
 
 
 def imshow_raster(raster_data, name='', cmap='rainbow'):
@@ -62,38 +83,17 @@ def imshow_raster(raster_data, name='', cmap='rainbow'):
 
     Parameters:
     - rater data: a dictionary
-        The raster data to be displayed. that has Image (2Darray) and GeoT_im (Geotransformation parameters)
+        The raster data to be displayed. that has Image (2Darray) and geotrans_im (Geotransformation parameters)
     - name: str, optional
         The label for the colorbar and the title suffix. Default is an empty string.
     - cmap: str optional
         the colormap name for visualization of the image. Default is rainbow
     """
     
-    def calculate_raster_extent(GeoT_im, raster_size):
-        """
-        Calculates the extent of the raster image based on geotransformation parameters and raster size.
-
-        Parameters:
-        - GeoT_im: list of floats
-            Geotransformation parameters.
-        - raster_size: tuple of ints
-            Size of the raster data (number of rows, number of columns).
-
-        Returns:
-        - extent: list of floats
-            Extent of the image in the format [xmin, xmax, ymin, ymax].
-        """
-        xmin, cell_size_x, _, ymax, _, cell_size_y_neg = GeoT_im
-        cell_size_y = -cell_size_y_neg
-
-        x_max = xmin + cell_size_x * raster_size[1]
-        y_min = ymax - cell_size_y * raster_size[0]
-        extent = [xmin, x_max, y_min, ymax]
-        return extent
     
     img_array = raster_data['Image']
-    geoT_im = raster_data['GeoT_im']
-    extent = calculate_raster_extent(geoT_im, img_array.shape)
+    geotrans_im = raster_data['GeoT_im']
+    extent = calculate_raster_extent(geotrans_im, img_array.shape)
     
     low_log = np.min(img_array[img_array > 0])
     if low_log<100:
@@ -124,8 +124,6 @@ def imshow_raster(raster_data, name='', cmap='rainbow'):
                                size_vertical=1,
                                fontproperties=fontprops)
     plt.gca().add_artist(scalebar)
-
-
 
     plt.title(f'{name} concentration map - (colorbar is in log scale)')
     plt.xlabel('x (m!)')
