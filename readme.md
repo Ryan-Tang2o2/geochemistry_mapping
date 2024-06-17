@@ -1,5 +1,5 @@
 # Project Title
-Continuous spatial distribution of Cu and Co concentrations
+Continuous spatial distribution of Cu and Co concentrations.
 
 ## Project Overview
 Geochemical soil surveys are commonly used in mineral exploration. Workers collect soil samples from specified locations across an area. These samples are analyzed to determine the concentrations of trace metals like copper (Cu) and cobalt (Co).
@@ -88,6 +88,5 @@ To generate plots of Cu and Co concentrations, follow these steps:
 ** The main_mapping_Cu_Co.ipynb can also works on Colab
 
 
-
 ## Contact Information
-For further assistance, please contact Ata Haddadi at ata.haddadi@gmail.com
+For further assistance, please contact Ata Haddadi at ata.haddadi@gmail.com.
